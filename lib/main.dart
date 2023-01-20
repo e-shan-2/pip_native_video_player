@@ -16,6 +16,7 @@ class _NativAppFlutterState extends State<NativAppFlutter> {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: HomePage(),
     );
   }

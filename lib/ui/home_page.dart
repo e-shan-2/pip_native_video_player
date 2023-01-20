@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
@@ -79,223 +77,255 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print(MediaQuery.of(context).size);
+    double totalWidth = MediaQuery.of(context).size.width;
     double width = MediaQuery.of(context).size.width / 3;
     double aspect = _controller.value.aspectRatio;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Video Player Demo'),
-      ),
-      // Use a FutureBuilder to display a loading spinner while waiting for the
-      // VideoPlayerController to finish initializing.
-      body: Column(
-        children: [
-          Stack(
-            children: [
-              // Video Player
-              GestureDetector(
-                onTap: () {
-                  if (_controller.value.isPlaying) {
-                    _controller.pause();
-                  } else {
-                    _controller.play();
-                  }
-                },
+    return totalWidth < 411.3
+        ? Scaffold(
+            body: Center(
                 child: FutureBuilder(
-                  future: _initializeVideoPlayerFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      // If the VideoPlayerController has finished initialization, use
-                      // the data it provides to limit the aspect ratio of the video.
-                      return AspectRatio(
-                        aspectRatio: _controller.value.aspectRatio,
-                        // Use the VideoPlayer widget to display the video.
-                        child: VideoPlayer(_controller),
-                      );
-                    } else {
-                      // If the VideoPlayerController is still initializing, show a
-                      // loading spinner.
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  },
-                ),
-              ),
-              Positioned(
-                top: 0,
-                bottom: 0,
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        backWard = true;
-                        backWardValue += 10;
-                      });
-
-                      _controller.seekTo(Duration(
-                          seconds: _controller.value.position.inSeconds - 10));
-                      Future.delayed(const Duration(seconds: 1), () {
-                        setState(() {
-                          backWard = false;
-                          backWardValue = 0;
-                        });
-                      });
-                    },
-                    child: Container(
-                      height: width / aspect,
-                      width: MediaQuery.of(context).size.width / 3,
-                      color: Colors.transparent,
-                      child: Center(
-                          child: backWard
-                              ? Text(
-                                  "$backWardValue\uf047",
-                                  style: const TextStyle(color: Colors.white),
-                                )
-                              : Container()),
-                    ),
-                  ),
-                ),
-              ),
-
-              // buttons
-              Positioned(
-                  bottom: 5,
-                  left: 10,
-                  top: 5,
-                  right: 10,
-                  child: _isEnd
-                      ? IconButton(
-                          onPressed: () {
-                            print(_isEnd);
-                            _controller.initialize();
-                          },
-                          icon: const Icon(
-                            Icons.replay,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                                onPressed: () {
-                                  _controller.seekTo(Duration(
-                                      seconds:
-                                          _controller.value.position.inSeconds -
-                                              10));
-                                },
-                                icon: Icon(
-                                  Icons.fast_rewind,
-                                  color: _controller.value.isPlaying
-                                      ? Colors.transparent
-                                      : Colors.white,
-                                )),
-
-                            const Padding(padding: EdgeInsets.all(2)),
-
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (_controller.value.isPlaying) {
-                                    _controller.pause();
-                                  } else {
-                                    // If the video is paused, play it.
-                                    _controller.play();
-                                  }
-                                });
-                              },
-                              // Display the correct icon depending on the state of the player.
-                              icon: Icon(
-                                _controller.value.isPlaying
-                                    ? Icons.pause
-                                    : Icons.play_arrow,
-                                color: _controller.value.isPlaying
-                                    ? Colors.transparent
-                                    : Colors.white,
-                              ),
-                            ),
-
-                            const Padding(padding: EdgeInsets.all(2)),
-
-                            IconButton(
-                                onPressed: () {
-                                  _controller.seekTo(Duration(
-                                      seconds:
-                                          _controller.value.position.inSeconds +
-                                              10));
-                                },
-                                icon: Icon(
-                                  Icons.fast_forward,
-                                  color: _controller.value.isPlaying
-                                      ? Colors.transparent
-                                      : Colors.white,
-                                )),
-
-                            // dsfghjkl
-                          ],
-                        )),
-
-              Positioned(
-                left: 2 * (MediaQuery.of(context).size.width / 3),
-                bottom: 0,
-                top: 0,
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    overlayColor: MaterialStateProperty.all(
-                        Colors.grey.withOpacity(0.06)),
-                    onTap: () {
-                      setState(() {
-                        forward = true;
-                        forwardValue += 10;
-                      });
-                      _controller.seekTo(Duration(
-                          seconds: _controller.value.position.inSeconds + 10));
-                      Future.delayed(const Duration(seconds: 1), () {
-                        setState(() {
-                          forward = false;
-                          forwardValue = 0;
-                        });
-                      });
-                    },
-                    child: Container(
-                      height: width / aspect,
-                      width: MediaQuery.of(context).size.width / 3,
-                      color: Colors.transparent,
-                      child: Center(
-                          child: forward
-                              ? Text(
-                                  "$forwardValue\uf047",
-                                  style: const TextStyle(color: Colors.white),
-                                )
-                              : Container()),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: _controller.value.isPlaying ? 0 : 5,
-                width: MediaQuery.of(context).size.width,
-                child: VideoProgressIndicator(
-                  _controller,
-                  allowScrubbing: true,
-                  colors: const VideoProgressColors(
-                      // backgroundColor: Colors.red,
-                      bufferedColor: Colors.black,
-                      playedColor: Colors.blueAccent),
-                ),
-              ),
-            ],
-          ),
-          ElevatedButton(
-              onPressed: () {
-                printSomething();
+              future: _initializeVideoPlayerFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  // If the VideoPlayerController has finished initialization, use
+                  // the data it provides to limit the aspect ratio of the video.
+                  return AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    // Use the VideoPlayer widget to display the video.
+                    child: VideoPlayer(_controller),
+                  );
+                } else {
+                  // If the VideoPlayerController is still initializing, show a
+                  // loading spinner.
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
               },
-              child: Text("dfsg"))
-        ],
-      ),
-    );
+            )),
+          )
+        : Scaffold(
+            appBar: AppBar(
+              title: const Text('Video Player Demo'),
+            ),
+            // Use a FutureBuilder to display a loading spinner while waiting for the
+            // VideoPlayerController to finish initializing.
+            body: Column(
+              children: [
+                Stack(
+                  children: [
+                    // Video Player
+                    GestureDetector(
+                      onTap: () {
+                        if (_controller.value.isPlaying) {
+                          _controller.pause();
+                        } else {
+                          _controller.play();
+                        }
+                      },
+                      child: FutureBuilder(
+                        future: _initializeVideoPlayerFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            // If the VideoPlayerController has finished initialization, use
+                            // the data it provides to limit the aspect ratio of the video.
+                            return AspectRatio(
+                              aspectRatio: _controller.value.aspectRatio,
+                              // Use the VideoPlayer widget to display the video.
+                              child: VideoPlayer(_controller),
+                            );
+                          } else {
+                            // If the VideoPlayerController is still initializing, show a
+                            // loading spinner.
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                    Positioned(
+                      top: 0,
+                      bottom: 0,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              backWard = true;
+                              backWardValue += 10;
+                            });
+
+                            _controller.seekTo(Duration(
+                                seconds:
+                                    _controller.value.position.inSeconds - 10));
+                            Future.delayed(const Duration(seconds: 1), () {
+                              setState(() {
+                                backWard = false;
+                                backWardValue = 0;
+                              });
+                            });
+                          },
+                          child: Container(
+                            height: width / aspect,
+                            width: MediaQuery.of(context).size.width / 3,
+                            color: Colors.transparent,
+                            child: Center(
+                                child: backWard
+                                    ? Text(
+                                        "$backWardValue\uf047",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      )
+                                    : Container()),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // buttons
+                    Positioned(
+                        bottom: 5,
+                        left: 10,
+                        top: 5,
+                        right: 10,
+                        child: _isEnd
+                            ? IconButton(
+                                onPressed: () {
+                                  print(_isEnd);
+                                  _controller.initialize();
+                                },
+                                icon: const Icon(
+                                  Icons.replay,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                      onPressed: () {
+                                        _controller.seekTo(Duration(
+                                            seconds: _controller
+                                                    .value.position.inSeconds -
+                                                10));
+                                      },
+                                      icon: Icon(
+                                        Icons.fast_rewind,
+                                        color: _controller.value.isPlaying
+                                            ? Colors.transparent
+                                            : Colors.white,
+                                      )),
+
+                                  const Padding(padding: EdgeInsets.all(2)),
+
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        if (_controller.value.isPlaying) {
+                                          _controller.pause();
+                                        } else {
+                                          // If the video is paused, play it.
+                                          _controller.play();
+                                        }
+                                      });
+                                    },
+                                    // Display the correct icon depending on the state of the player.
+                                    icon: Icon(
+                                      _controller.value.isPlaying
+                                          ? Icons.pause
+                                          : Icons.play_arrow,
+                                      color: _controller.value.isPlaying
+                                          ? Colors.transparent
+                                          : Colors.white,
+                                    ),
+                                  ),
+
+                                  const Padding(padding: EdgeInsets.all(2)),
+
+                                  IconButton(
+                                      onPressed: () {
+                                        _controller.seekTo(Duration(
+                                            seconds: _controller
+                                                    .value.position.inSeconds +
+                                                10));
+                                      },
+                                      icon: Icon(
+                                        Icons.fast_forward,
+                                        color: _controller.value.isPlaying
+                                            ? Colors.transparent
+                                            : Colors.white,
+                                      )),
+
+                                  // dsfghjkl
+                                ],
+                              )),
+
+                    Positioned(
+                      left: 2 * (MediaQuery.of(context).size.width / 3),
+                      bottom: 0,
+                      top: 0,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          overlayColor: MaterialStateProperty.all(
+                              Colors.grey.withOpacity(0.06)),
+                          onTap: () {
+                            setState(() {
+                              forward = true;
+                              forwardValue += 10;
+                            });
+                            _controller.seekTo(Duration(
+                                seconds:
+                                    _controller.value.position.inSeconds + 10));
+                            Future.delayed(const Duration(seconds: 1), () {
+                              setState(() {
+                                forward = false;
+                                forwardValue = 0;
+                              });
+                            });
+                          },
+                          child: Container(
+                            height: width / aspect,
+                            width: MediaQuery.of(context).size.width / 3,
+                            color: Colors.transparent,
+                            child: Center(
+                                child: forward
+                                    ? Text(
+                                        "$forwardValue\uf047",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      )
+                                    : Container()),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: _controller.value.isPlaying ? 0 : 5,
+                      width: MediaQuery.of(context).size.width,
+                      child: VideoProgressIndicator(
+                        _controller,
+                        allowScrubbing: true,
+                        colors: const VideoProgressColors(
+                            // backgroundColor: Colors.red,
+                            bufferedColor: Colors.black,
+                            playedColor: Colors.blueAccent),
+                      ),
+                    ),
+                  ],
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      printSomething();
+                      print(MediaQuery.of(context).size);
+                    },
+                    child: Text("dfsg"))
+              ],
+            ),
+          );
   }
 
   Future<void> printSomething() async {

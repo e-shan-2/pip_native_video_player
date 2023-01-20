@@ -1,10 +1,11 @@
 package com.example.native_practice
 
 import android.app.PictureInPictureParams
-import android.graphics.Rect
+import android.graphics.Point
 import android.os.Build
 import android.util.Log
-import android.view.View
+import android.util.Rational
+import android.view.Display
 import androidx.annotation.RequiresApi
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -30,21 +31,20 @@ class MainActivity: FlutterActivity() {
                 Log.d("nativ_communication","wertyuio hi")
 
 
-//                val mOnLayoutChangeListener: View.OnLayoutChangeListener = View.OnLayoutChangeListener { v, oldLeft, oldTop, oldRight, oldBottom, newLeft, newTop, newRight, newBottom ->
-//                    val sourceRectHint = Rect()
-//                    mYourVideoView.getGlobalVisibleRect(sourceRectHint)
-//                    val builder = PictureInPictureParams.Builder()
-//                            .setSourceRectHint(sourceRectHint)
-//                    setPictureInPictureParams(builder.build())
-//                }
-
-
-
-
-//
-//                val params = PictureInPictureParams.Builder() // Set actions or aspect ratio.
-//                        .build()
+//                val display: Display = windowManager.defaultDisplay
+//                val size = Point()
+//                display.getSize(size)
+//                val width: Int = size.x
+//                val height: Int = size.y
+//                val aspectRatio = Rational(width, height)
+//                val params = PictureInPictureParams.Builder()
+//                        .setAspectRatio(aspectRatio).build()
 //                enterPictureInPictureMode(params)
+
+
+                val params = PictureInPictureParams.Builder() // Set actions or aspect ratio.
+                        .build()
+                enterPictureInPictureMode(params)
 
                 }
 
